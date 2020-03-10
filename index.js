@@ -1,19 +1,27 @@
 'use strict';
-const searchString1 = 'https://api.github.com/search/users?q=user:';
-const searchString2 = 'https://api.github.com/users/'
 const fs = require('fs');
 const inquirer = require('inquirer');
+const axios = require('axios');
+
+
+const searchString1 = 'https://api.github.com/search/users?q=user:';
+const searchString2 = 'https://api.github.com/users/'
+
 const colors = ['white', 'silver', 'gray', 'black', 'maroon',
     'yellow', 'olive', 'lime', 'green', 'aqua', 'teal', 'blue', 'navy', 'fuchia', 'purple'
 ];
-let profile;
+
+
+
 
 
 async function getGitHubProfileAsync(name) {
-    let response = await fetch(`${searchstring1}${name}`);
-    let profile = await response.json();
-    return profile;
+    const url = `${searchString2}${name}`;
+    const response = await axios.get(url);
+    console.log(response.data);
+    return response.data;
 }
+
 
 const questions = [{
         type: 'list',
@@ -25,52 +33,41 @@ const questions = [{
         type: 'input',
         message: 'What is your GitHub User Name?',
         name: 'username',
-        validate: function(input) {
-            var done = this.async();
-            setTimeout(function() {
-                const profile = getGitHubProfileAsync(input);
-                if (profile.message !== undefined) {
-                    // Pass the return value in the done callback
-                    done('You need to provide a valid GitHub User Name.');
-                    return;
-                }
-                done(null, true);
-            }, 3000);
-        }
     }
 ];
 
-
-
-
-
-
 function writeToFile(fileName, data) {}
 
-function handleResponse(response) {
-    console.log(`${response.name}  ${response.color}`);
+
+
+
+
+
+async function getGitHubProfile(name) {
+    const url = `${searchString2}${name}`;
+    axios.get(url)
+        .then(function(response) {
+            console.log(response.data);
+        })
+        .catch(function(error) {
+            console.log(error);
+            //    console.log(`Error: code-${error.error.status} text-${error.error.statusText}`);
+        })
+
+}
+
+
+async function getData(name) {
+    const profile = await getGitHubProfile(name);
 }
 
 function init() {
     inquirer.prompt(questions).then(answers => {
-        console.log(JSON.stringify(answers, null, '  '));
+        //    console.log(JSON.stringify(answers, null, '  '));
+        getData(answers.username);
     })
 }
 
-async function getUserAsync(name) {
-    let response = await fetch(`https://api.github.com/users/${name}`);
-    let data = await response.json()
-    return data;
-}
 
-const x = getUserAsync('spleban');
-console.log(x);
-// init();
 
-// if (response.name === undefined || response.name === '') {
-//     console.log('You must enter your GitHub name!')
-// } else if (response.color === undefined || response.name === '') {
-//     console.log('You must enter a color!')
-// } else {
-//     writeToFile();
-// }
+init();
