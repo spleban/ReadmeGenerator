@@ -2,72 +2,239 @@
 const fs = require('fs');
 const inquirer = require('inquirer');
 const axios = require('axios');
-
-
-const searchString1 = 'https://api.github.com/search/users?q=user:';
-const searchString2 = 'https://api.github.com/users/'
-
-const colors = ['white', 'silver', 'gray', 'black', 'maroon',
-    'yellow', 'olive', 'lime', 'green', 'aqua', 'teal', 'blue', 'navy', 'fuchia', 'purple'
-];
-
-
-
-
-
-async function getGitHubProfileAsync(name) {
-    const url = `${searchString2}${name}`;
-    const response = await axios.get(url);
-    console.log(response.data);
-    return response.data;
+const util = require("util");
+const writeFileAsync = util.promisify(fs.writeFile);
+const colors = {
+    green: {
+        wrapperBackground: "#E6E1C3",
+        headerBackground: "#C1C72C",
+        headerColor: "black",
+        photoBorderColor: "#black"
+    },
+    blue: {
+        wrapperBackground: "#5F64D3",
+        headerBackground: "#26175A",
+        headerColor: "white",
+        photoBorderColor: "#73448C"
+    },
+    pink: {
+        wrapperBackground: "#879CDF",
+        headerBackground: "#FF8374",
+        headerColor: "white",
+        photoBorderColor: "#FEE24C"
+    },
+    red: {
+        wrapperBackground: "#DE9967",
+        headerBackground: "#870603",
+        headerColor: "white",
+        photoBorderColor: "white"
+    }
 }
 
 
-const questions = [{
-        type: 'list',
-        message: 'What is your favorite color?',
-        name: 'color',
-        choices: colors
-    },
-    {
-        type: 'input',
-        message: 'What is your GitHub User Name?',
-        name: 'username',
-    }
-];
+function generateHTML(style) {
+    console.log(style);
+    return `<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"/>
+      <link href="https://fonts.googleapis.com/css?family=BioRhyme|Cabin&display=swap" rel="stylesheet">
+      <title>Document</title>
+      <style>
+          @page {
+            margin: 0;
+          }
+         *,
+         *::after,
+         *::before {
+         box-sizing: border-box;
+         }
+         html, body {
+         padding: 0;
+         margin: 0;
+         }
+         html, body, .wrapper {
+         height: 100%;
+         }
+         .wrapper {
+         background-color: ${style.wrapperBackground};
+         padding-top: 100px;
+         }
+         body {
+         background-color: white;
+         -webkit-print-color-adjust: exact !important;
+         font-family: 'Cabin', sans-serif;
+         }
+         main {
+         background-color: #E9EDEE;
+         height: auto;
+         padding-top: 30px;
+         }
+         h1, h2, h3, h4, h5, h6 {
+         font-family: 'BioRhyme', serif;
+         margin: 0;
+         }
+         h1 {
+         font-size: 3em;
+         }
+         h2 {
+         font-size: 2.5em;
+         }
+         h3 {
+         font-size: 2em;
+         }
+         h4 {
+         font-size: 1.5em;
+         }
+         h5 {
+         font-size: 1.3em;
+         }
+         h6 {
+         font-size: 1.2em;
+         }
+         .photo-header {
+         position: relative;
+         margin: 0 auto;
+         margin-bottom: -50px;
+         display: flex;
+         justify-content: center;
+         flex-wrap: wrap;
+         background-color: ${style.headerBackground};
+         color: ${style.headerColor};
+         padding: 10px;
+         width: 95%;
+         border-radius: 6px;
+         }
+         .photo-header img {
+         width: 250px;
+         height: 250px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-top: -75px;
+         border: 6px solid ${style.photoBorderColor};
+         box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
+         }
+         .photo-header h1, .photo-header h2 {
+         width: 100%;
+         text-align: center;
+         }
+         .photo-header h1 {
+         margin-top: 10px;
+         }
+         .links-nav {
+         width: 100%;
+         text-align: center;
+         padding: 20px 0;
+         font-size: 1.1em;
+         }
+         .nav-link {
+         display: inline-block;
+         margin: 5px 10px;
+         }
+         .workExp-date {
+         font-style: italic;
+         font-size: .7em;
+         text-align: right;
+         margin-top: 10px;
+         }
+         .container {
+         padding: 50px;
+         padding-left: 100px;
+         padding-right: 100px;
+         }
 
-function writeToFile(fileName, data) {}
+         .row {
+           display: flex;
+           flex-wrap: wrap;
+           justify-content: space-between;
+           margin-top: 20px;
+           margin-bottom: 20px;
+         }
+
+         .card {
+           padding: 20px;
+           border-radius: 6px;
+           background-color: ${style.headerBackground};
+           color: ${style.headerColor};
+           margin: 20px;
+         }
+         
+         .col {
+         flex: 1;
+         text-align: center;
+         }
+
+         a, a:hover {
+         text-decoration: none;
+         color: inherit;
+         font-weight: bold;
+         }
+
+         @media print { 
+          body { 
+            zoom: .75; 
+          } 
+         }
+      </style>`
+}
 
 
 
 
 
 
-async function getGitHubProfile(name) {
-    const url = `${searchString2}${name}`;
-    axios.get(url)
-        .then(function(response) {
-            console.log(response.data);
-        })
-        .catch(function(error) {
-            console.log(error);
-            //    console.log(`Error: code-${error.error.status} text-${error.error.statusText}`);
-        })
+const searchString = 'https://api.github.com/users/'
 
+const colorChoices = Object.getOwnPropertyNames(colors);
+
+
+
+async function writeToFile(fileName, data) {
+    console.log(data);
+    //generateHTML(fileName, data)
 }
 
 
 async function getData(name) {
-    const profile = await getGitHubProfile(name);
+    const url = `${searchString}${name}`;
+    return axios.get(url);
 }
 
-function init() {
-    inquirer.prompt(questions).then(answers => {
-        //    console.log(JSON.stringify(answers, null, '  '));
-        getData(answers.username);
+async function init() {
+    const questions = [{
+            type: 'list',
+            message: 'What is your favorite color?',
+            name: 'color',
+            choices: colorChoices
+        },
+        {
+            type: 'input',
+            message: 'What is your GitHub User Name?',
+            name: 'username',
+        }
+    ];
+
+    return await inquirer.prompt(questions)
+}
+
+
+let style;
+init()
+    .then(function(answers) {
+        style = `colors.${answers.color}`;
+        console.log(style);
+        return getData(answers.username);
     })
-}
-
-
-
-init();
+    .then(function(response) {
+        const html = generateHTML(style);
+        writeToFile('./output/text.html', html);
+    })
+    .then(function() {
+        console.log("Successfully wrote to index.html");
+    })
+    .catch(function(err) {
+        console.log(err);
+    });
