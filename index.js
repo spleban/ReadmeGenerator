@@ -3,7 +3,7 @@ const fs = require('fs');
 const inquirer = require('inquirer');
 const axios = require('axios');
 const util = require("util");
-const writeFileAsync = util.promisify(fs.writeFile);
+var pdf = require('html-pdf');
 const colors = {
     green: {
         wrapperBackground: "#E6E1C3",
@@ -178,7 +178,22 @@ function generateHTML(style) {
             zoom: .75; 
           } 
          }
-      </style>`
+      </style>
+      
+      <body>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h1 class="display-4">Hi! My name is MY-NAME</h1>
+                <p class="lead">I am from MY LOCATION.</p>
+                <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
+                <ul class="list-group">
+                    <li class="list-group-item">My GitHub username is MY GITHUB</li>
+                    <li class="list-group-item">LinkedIn: MY LINKEDIN</li>
+                </ul>
+            </div>
+        </div>
+      </body>
+</html>`
 }
 
 
@@ -190,17 +205,18 @@ const searchString = 'https://api.github.com/users/'
 
 const colorChoices = Object.getOwnPropertyNames(colors);
 
-
-
-async function writeToFile(fileName, data) {
-    console.log(data);
-    //generateHTML(fileName, data)
+async function writeToFile(fileName, html) {
+    console.log(html);
+    const options = { format: 'Letter' };
+    pdf.create(html, options).toFile(fileName, function(err, res) {
+        if (err) return console.log(err);
+        console.log(res); // { filename: '/app/businesscard.pdf' }
+    });
 }
-
 
 async function getData(name) {
     const url = `${searchString}${name}`;
-    return axios.get(url);
+    return await axios.get(url);
 }
 
 async function init() {
@@ -213,24 +229,33 @@ async function init() {
         {
             type: 'input',
             message: 'What is your GitHub User Name?',
-            name: 'username',
+            name: 'userName',
+        },
+        {
+            type: 'input',
+            message: 'Enter the output PDF file name (no folder, no extension)?',
+            name: 'fileName',
         }
     ];
-
     return await inquirer.prompt(questions)
 }
 
-
 let style;
+let fileName;
+let html;
 init()
     .then(function(answers) {
         style = `colors.${answers.color}`;
-        console.log(style);
-        return getData(answers.username);
+        fileName = `./Output/${answers.fileName}.pdf`;
+        return getData(answers.userName);
     })
     .then(function(response) {
-        const html = generateHTML(style);
-        writeToFile('./output/text.html', html);
+        html = generateHTML(style, response);
+        writeToFile(fileName, html)
+    })
+    .then(function(response) {
+        html = generateHTML(style);
+        writeToFile(fileName, html)
     })
     .then(function() {
         console.log("Successfully wrote to index.html");
