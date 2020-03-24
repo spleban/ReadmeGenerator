@@ -1,13 +1,20 @@
+# Github Profile Generator
 A command-line application that dynamically generates a PDF profile from a GitHub username. The application is invoked with the following command:
 
-```sh
-node index.js
-```
+# Repos used
+fs 
+inquirer 
+axios
+pdf
 
-The user is prompted for a favorite color, is used as the background color for cards.
+# Input
+1. favorite color
+2. name of GitHub user
+3. File name. If left empty it is the GitHub user name.
 
-The file is populated with the following:
-
+# Output
+A pdf file that is written to the folder Output.
+The file contents is 
 * Profile image
 * User name
 * Links to the following:
@@ -20,43 +27,3 @@ The file is populated with the following:
 * Number of GitHub stars
 * Number of users following
 
-Found
-{
-    "login": "boboxyz",
-    "id": 9119394,
-    "node_id": "MDQ6VXNlcjkxMTkzOTQ=",
-    "avatar_url": "https://avatars1.githubusercontent.com/u/9119394?v=4",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/boboxyz",
-    "html_url": "https://github.com/boboxyz",
-    "followers_url": "https://api.github.com/users/boboxyz/followers",
-    "following_url": "https://api.github.com/users/boboxyz/following{/other_user}",
-    "gists_url": "https://api.github.com/users/boboxyz/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/boboxyz/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/boboxyz/subscriptions",
-    "organizations_url": "https://api.github.com/users/boboxyz/orgs",
-    "repos_url": "https://api.github.com/users/boboxyz/repos",
-    "events_url": "https://api.github.com/users/boboxyz/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/boboxyz/received_events",
-    "type": "User",
-    "site_admin": false,
-    "name": null,
-    "company": null,
-    "blog": "",
-    "location": null,
-    "email": null,
-    "hireable": null,
-    "bio": null,
-    "public_repos": 0,
-    "public_gists": 0,
-    "followers": 0,
-    "following": 0,
-    "created_at": "2014-10-09T18:59:14Z",
-    "updated_at": "2017-07-31T19:16:27Z"
-}
-
-Not Found
-{
-    "message": "Not Found",
-    "documentation_url": "https://developer.github.com/v3/users/#get-a-single-user"
-}
