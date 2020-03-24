@@ -1,6 +1,11 @@
 # Github Profile Generator
 A command-line application that dynamically generates a PDF profile from a GitHub username. The application is invoked with the following command:
 
+# Vulenrabilties:
+The pdf package has high severity vulenarbility.
+This repo is a class exercise only
+Do not use it for any other purposes.
+
 # Repos used
 fs 
 inquirer 
