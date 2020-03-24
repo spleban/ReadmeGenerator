@@ -3,39 +3,18 @@ const fs = require('fs');
 const inquirer = require('inquirer');
 const axios = require('axios');
 const util = require("util");
-var pdf = require('html-pdf');
-const colors = {
-    green: {
-        wrapperBackground: "#E6E1C3",
-        headerBackground: "#C1C72C",
-        headerColor: "black",
-        photoBorderColor: "#black"
-    },
-    blue: {
-        wrapperBackground: "#5F64D3",
-        headerBackground: "#26175A",
-        headerColor: "white",
-        photoBorderColor: "#73448C"
-    },
-    pink: {
-        wrapperBackground: "#879CDF",
-        headerBackground: "#FF8374",
-        headerColor: "white",
-        photoBorderColor: "#FEE24C"
-    },
-    red: {
-        wrapperBackground: "#DE9967",
-        headerBackground: "#870603",
-        headerColor: "white",
-        photoBorderColor: "white"
-    }
-}
+const pdf = require('html-pdf');
 
+const searchString = 'https://api.github.com/users/'
+const colors = ['aqua', 'lightgreen', 'pink', 'orange', 'yellow'];
 
-function generateHTML(style) {
-    console.log(style);
+function generateHTML(color, data) {
+    let name = (data.name) ? data.name : data.login;
+    let myWork = (data.company) ? `at ${data.company}` : 'Consultant';
+    let bio = (data.bio) ? data.bio : "";
+    let location = (data.location != null && data.location) ? data.location : 'San Francisco';
     return `
-    !DOCTYPE html>
+    <!DOCTYPE html>
     <html lang="en">
    <head>
       <meta charset="UTF-8" />
@@ -58,66 +37,63 @@ function generateHTML(style) {
            justify-content: center;
            margin-top: 20px;
            margin-bottom: 20px;
-           background-color: red;
-         }
+        }
 
          .col {
             flex: 1;
             text-align: center;
+            justify-content: center;
          }
          
-        .ft11{font-size:18px;color:#000000;}
+        .ft11{font-size:22px;color:#000000;}
 	    .ft12{font-size:38px;color:#000000;}
 	    .ft13{font-size:31px;color:#000000;}
-	    .ft14{font-size:15px;color:#000000;}
-	    .ft15{font-size:12px;color:#ffffff;}
-	    .ft16{font-size:12px;color:#000000;}
+	    .ft14{font-size:27px;color:#000000;}
+	    .ft15{font-size:24px;color:#ffffff;}
+	    .ft16{font-size:20px;color:#000000;}
       </style>
     <body>
         <div class="container mt-3">
-            <div class = 'row'>
-                <div class = 'col'>
+            <div class = 'row center-block'>
+              <div class = 'col'>
+                <img src=${data.avatar_url} alt="my picture" height="100" width="100">
                 <p class="ft12">Hi!</p>
-                <p class="ft13" id = 'name'>My&#160;name&#160;is&#160;Christian&#160;Eckenrode!</p>
-                <p class="ft14">Currently&#160;@&#160;Trilogy&#160;Education&#160;Services</p>
-                <span class="ft15"><a class = 'map' href="https://www.google.com/maps/place/Richmond,%20Virginia"></a></span>
-                <span class="ft16"><a class = 'map' href="https://www.google.com/maps/place/Richmond,%20Virginia">&#160;Richmond,&#160;Virginia</a></span>
+                <p class="ft13" id = 'name'>My name is ${name}!</p>
+                <p class="ft14">I am Currently ${myWork}</p>
+                <span class="ft16"><a class = 'map' href="https://www.google.com/maps/place/${location}">I live in ${location}</a></span>
                 <span class="ft15">&#160;</span>
-                <span class="ft16"><a class = 'github' href="https://github.com/ceckenrode"></a></span>
-                <span class="ft16"><a class = 'github' href="https://github.com/ceckenrode">&#160;GitHub</a></span>
-                <span class="ft15">&#160;&#160;<a class = 'twitter' href="https://eck.im/twitter"></a></span>
-                <span class="ft16"><a class = 'twitter' href="https://eck.im/twitter">&#160;Blog</a></span>
-                </div>
+                <span class="ft16"><a class = 'github' href="${data.html_url}">my GitHub</a></span>
+              </div>
             </div>
             <div class = 'row'>
                 <div class = 'col'>
-                    <p class="ft10">I&#160;build&#160;things&#160;and&#160;teach&#160;people&#160;to&#160;code.</p>
+                    <p class="ft10">${bio}</p>
                 </div>
             </div>
-
-            <div class = 'row'>
-                <div class="col-md-6" style="background-color:yellow; border: 10px">
-                    <p class="ft10">Public&#160;Repositories</p>
-                    <p class="ft11" id = 'repositorIes'>135</p>
+            <div class = 'container'>
+              <div class = 'row'>
+                <div class="col" style="background-color:${color}; border: 10px">
+                    <p class="ft10">Public Repositories</p>
+                    <p class="ft11" id = 'repositories'>${data.public_repos}</p>
                 </div>
 
-                <div class="col-md-6" style="background-color:green;">
+                <div class="col" style="background-color:${color};">
                     <p class="ft10">Followers</p>
-                    <p class="ft11" id = 'followers'>92</p>
+                    <p class="ft11" id = 'followers'>${data.followers}</p>
                 </div>
-                
-            </div>
+              </div>
 
-            <div class = 'row'>
-                <div class="col-md-6" style="background-color:aqua;">
+              <div class = 'row'>
+                <div class="col" style="background-color:${color};">
                     <p class="ft10">GitHub&#160;Stars</p>
-                    <p class="ft11" id = 'stars'>65</p>
+                    <p class="ft11" id = 'stars'>${data.public_gists}</p>
                 </div>
 
-                <div class="col-md-6" style="background-color:lightblue">
+                <div class="col" style="background-color:${color}">
                     <p class="ft10">Following</p>
-                    <p class="ft11" id = 'following'>65</p>
+                    <p class="ft11" id = 'following'>${data.following}</p>
                 </div>
+              </div>
             </div>
         </div>
     </body>
@@ -125,17 +101,7 @@ function generateHTML(style) {
     `
 }
 
-
-
-
-
-
-const searchString = 'https://api.github.com/users/'
-
-const colorChoices = Object.getOwnPropertyNames(colors);
-
 async function writeToFile(fileName, html) {
-    console.log(html);
     fs.writeFile(`${fileName}.html`, html, (err) => {
         if (err) throw err;
         const options = {
@@ -143,56 +109,58 @@ async function writeToFile(fileName, html) {
             orientation: "portrait",
             border: "10mm"
         };
-        pdf.create(html, options).toFile(`${fileName}.pdf`, function (err, res) {
+        pdf.create(html, options).toFile(`${fileName}.pdf`, function(err, res) {
             if (err) return console.log(err);
-            console.log(res);
-
+            fs.unlink(`${fileName}.html`, (err) => {
+                if (err) throw err;
+            })
         });
     });
 }
 
 async function getData(name) {
-            const url = `${searchString}${name}`;
-            return await axios.get(url);
-        }
+    const url = `${searchString}${name}`;
+    return await axios.get(url);
+}
 
 async function init() {
-            const questions = [{
-                type: 'list',
-                message: 'What is your favorite color?',
-                name: 'color',
-                choices: colorChoices
-            },
-            {
-                type: 'input',
-                message: 'What is your GitHub User Name?',
-                name: 'userName',
-            },
-            {
-                type: 'input',
-                message: 'Enter the output PDF file name (no folder, no extension)?',
-                name: 'fileName',
-            }
-            ];
-            return await inquirer.prompt(questions)
+    const questions = [{
+            type: 'list',
+            message: 'What is your favorite color?',
+            name: 'color',
+            choices: colors
+        },
+        {
+            type: 'input',
+            message: 'What is your GitHub User Name?',
+            name: 'userName',
+        },
+        {
+            type: 'input',
+            message: 'Enter the output PDF file name (no folder, no extension)?',
+            name: 'fileName',
         }
+    ];
+    return await inquirer.prompt(questions)
+}
 
-let style;
-    let fileName;
-    let html;
-    init()
-        .then(function (answers) {
-            style = `colors.${answers.color}`;
-            fileName = `./Output/${answers.fileName}`;
-            return getData(answers.userName);
-        })
-        .then(function (response) {
-            html = generateHTML(style, response);
-            writeToFile(fileName, html)
-        })
-        .then(function () {
-            console.log("Successfully wrote to index.html");
-        })
-        .catch(function (err) {
-            console.log(err);
-        });
+let color;
+let fileName;
+let html;
+init()
+    .then(function(answers) {
+        color = answers.color;
+        fileName = (answers.fileName) ? answers.fileName : answers.userName;
+        fileName = `./Output/${fileName}`;
+        return getData(answers.userName);
+    })
+    .then(function(response) {
+        html = generateHTML(color, response.data);
+        writeToFile(fileName, html)
+    })
+    .then(function() {
+        console.log(`Successfully wrote to ${fileName}.pdf`);
+    })
+    .catch(function(err) {
+        console.log(err);
+    });
